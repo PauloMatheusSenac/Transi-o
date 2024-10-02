@@ -1,0 +1,118 @@
+-- DROP DATABASE EAoQuadrado;
+CREATE DATABASE EAoQuadrado;
+USE EAoQuadrado;
+
+CREATE TABLE estados (
+    id_estado INT AUTO_INCREMENT PRIMARY KEY,
+    estado VARCHAR(100)
+);
+
+CREATE TABLE cidades (
+    id_cidade INT AUTO_INCREMENT PRIMARY KEY,
+    id_estado INT,
+    cidade VARCHAR(100),
+    FOREIGN KEY (id_estado) REFERENCES estados(id_estado)
+);
+
+CREATE TABLE enderecos (
+    id_endereco INT AUTO_INCREMENT PRIMARY KEY,
+    id_cidade INT,
+    cep VARCHAR(9),    
+    endereco VARCHAR(100),
+    bairro VARCHAR(100),
+    complemento VARCHAR(100),
+    FOREIGN KEY (id_cidade) REFERENCES cidades(id_cidade)
+);
+
+CREATE TABLE Lojas (
+    id_loja INT AUTO_INCREMENT PRIMARY KEY,
+    nome_loja VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    telefone VARCHAR(14) NOT NULL,
+    id_endereco INT,
+    cpf_cnpj VARCHAR(14) UNIQUE NOT NULL,
+    loja_imagem VARCHAR(255),
+    FOREIGN KEY (id_endereco) REFERENCES enderecos(id_endereco)
+);
+
+CREATE TABLE Categorias (
+    id_categoria INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255),
+    descricao VARCHAR(100)
+);
+
+CREATE TABLE Produtos (
+    id_produto INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao VARCHAR(255),
+    marca VARCHAR(100),
+    preco DECIMAL(10, 2) NOT NULL,
+    imagens JSON,  
+    cores VARCHAR(255),  
+    quantidade INT NOT NULL,
+    id_loja INT,  
+    id_categoria INT,  
+    frete DECIMAL(10, 2),  
+    FOREIGN KEY (id_loja) REFERENCES Lojas(id_loja),  
+    FOREIGN KEY (id_categoria) REFERENCES Categorias(id_categoria)  
+);
+
+CREATE TABLE Usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Sexos (
+    id_sexo INT AUTO_INCREMENT PRIMARY KEY,
+    sexo ENUM('Masculino','Feminino', 'Outro') NOT NULL
+);
+
+CREATE TABLE Clientes (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    sobrenome VARCHAR(100) NOT NULL,
+    nascimento DATE NOT NULL,
+    cpf VARCHAR(11) NOT NULL,
+    numero_telefone VARCHAR(12) NOT NULL,
+    email VARCHAR(200) UNIQUE NOT NULL,
+    senha VARCHAR(150) NOT NULL,
+    id_endereco INT,
+    id_sexo INT,
+    id_usuario INT,
+    FOREIGN KEY (id_endereco) REFERENCES enderecos(id_endereco),
+    FOREIGN KEY (id_sexo) REFERENCES Sexos(id_sexo),
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+);
+
+CREATE TABLE Vendedores (
+    id_vendedor INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+);
+
+CREATE TABLE Administradores (
+    id_administrador INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario)
+);
+
+CREATE TABLE Comentario (
+    id_comentario INT PRIMARY KEY AUTO_INCREMENT,
+    id_cliente INT,
+    comentario VARCHAR(255) NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
+);
+
+CREATE TABLE Avaliacao (
+    id_avaliacao INT PRIMARY KEY AUTO_INCREMENT,
+    id_cliente INT,
+    id_vendedor INT,
+    id_produto INT,
+    avaliacao VARCHAR(255),
+    nota FLOAT DEFAULT 0,
+    FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
+    FOREIGN KEY (id_vendedor) REFERENCES Vendedores(id_vendedor),
+    FOREIGN KEY (id_produto) REFERENCES Produtos(id_produto)
+);
